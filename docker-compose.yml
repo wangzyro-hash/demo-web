@@ -1,0 +1,8 @@
+services:
+  web:
+    build: .
+    ports:
+      - "0:3000"      # let Docker pick a free host port
+    environment:
+      - PORT=3000
+      - API_KEY=${API_KEY:-demo}

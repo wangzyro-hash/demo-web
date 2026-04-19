@@ -1,0 +1,22 @@
+version: 1
+project: demo-web
+profiles:
+  test:
+    env_file: .env.sandbox
+    compose_file: docker-compose.yml
+    prepare:
+      - "docker compose --env-file .env.sandbox build"
+    deploy:
+      - "docker compose --env-file .env.sandbox up -d"
+    verify:
+      - |
+        PORT=$(docker compose port web 3000 | awk -F: '{print $2}') && \
+        curl -fsSL "http://127.0.0.1:${PORT}/health"
+      - |
+        PORT=$(docker compose port web 3000 | awk -F: '{print $2}') && \
+        curl -fsS -o /dev/null -w "%{http_code}" "http://127.0.0.1:${PORT}/error" | grep -q 500
+    web_services: [web]
+    artifacts:
+      - "reports/**"
+deploy:
+  enabled: false
